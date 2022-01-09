@@ -98,7 +98,7 @@ static const char rcsid[] _U_ =
 #include <linux/if_ether.h>
 #include <net/if_arp.h>
 #include <poll.h>
-
+#include <linux/sockios.h> //[Eugene.Han+]
 /*
  * Got Wireless Extensions?
  */

@@ -1,0 +1,37 @@
+Step 1.Install required tools
+>apt install bison flex
+
+Step 2.[key step] Configure libpcap to compile
+>cd libpcap
+>chmod +x configure runlex.sh
+>CFLAGS=-static ./configure
+
+Step 3.Negative rpcapd/libpcap floder to generate libpcap lib first.
+>make
+
+If you meet following issue:
+
+gcc -static -O2 -fPIC -static -I.  -DHAVE_CONFIG_H  -D_U_="__attribute__((unused))" -DHAVE_REMOTE  -c ./pcap-linux.c
+./pcap-linux.c: In function ‘pcap_read_packet’:
+./pcap-linux.c:1005:31: error: ‘SIOCGSTAMP’ undeclared (first use in this function); did you mean ‘SIOCGIWAP’?
+ 1005 |         if (ioctl(handle->fd, SIOCGSTAMP, &pcap_header.ts) == -1) {
+      |                               ^~~~~~~~~~
+      |                               SIOCGIWAP
+./pcap-linux.c:1005:31: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Makefile:80: pcap-linux.o] Error 1
+
+try to add #include <linux/sockios.h>
+ in pcap-linux.c
+
+Re-compile, we will get libpcap.a
+
+Step 4. negative to rpcapd floder and generate rpcapd
+>cd ..
+>make
+
+If you meet following issue:
+
+/usr/bin/ld: pcap-new.o:/home/eugene/Desktop/Note/rpcapd-linux/libpcap/pcap-new.c:60: multiple definition of `sockmain'; 
+rpcapd.o:/home/eugene/Desktop/Note/rpcapd-linux/rpcapd.c:62: first defined here
+
+Try to add modify pcap-new.c in rpcapd/libpcap floder from "SOCKET sockmain" to "extern SOCKET sockmain". Then re-build libpcap.a and rpcapd again
